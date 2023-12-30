@@ -90,7 +90,7 @@ namespace GameEngine.ImageClassification
 				});
 			}
 
-			//dispose tensors
+			// Dispose tensors
 			tensor.Dispose();
 			outputTensor.Dispose();
 			yield return null;
