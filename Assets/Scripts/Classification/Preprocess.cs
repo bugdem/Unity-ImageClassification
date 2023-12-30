@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
 
-namespace ImageClassification.Core
+namespace GameEngine.ImageClassification
 {
 	public class Preprocess : MonoBehaviour
 	{

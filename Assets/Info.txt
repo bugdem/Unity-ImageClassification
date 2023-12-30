@@ -1,0 +1,2 @@
+Extension project of "Machine Learning Models in Unity with Barracuda: Image Classification" by Third Aurora.
+You can learn more about model and preprocessing-postprocessing from "https://github.com/onnx/models/tree/main/validated/vision/classification/efficientnet-lite4"

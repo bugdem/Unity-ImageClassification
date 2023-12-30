@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ImageClassification.Core
+namespace GameEngine.ImageClassification
 {
 	public class CameraView : MonoBehaviour
 	{

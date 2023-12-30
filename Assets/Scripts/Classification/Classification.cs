@@ -3,11 +3,9 @@ using Unity.Barracuda;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
-using UnityEngine.UI;
-using System;
-using ImageClassification.Core;
+using GameEngine.Translation;
 
-namespace ImageClassification.Core
+namespace GameEngine.ImageClassification
 {
 	/// <summary>
 	/// Uses classification preprocess variables
@@ -15,6 +13,8 @@ namespace ImageClassification.Core
 	/// </summary>
 	public class Classification : MonoBehaviour
 	{
+		[SerializeField] private bool _useTranslation = false;
+
 		[Header("Model")]
 		[SerializeField] private NNModel _modelFile;
 		[SerializeField] private TextAsset _labelAsset;
@@ -40,15 +40,14 @@ namespace ImageClassification.Core
 
 		void LoadLabels()
 		{
-			//get only items in quotes
+			// Get only items in quotes
 			var stringArray = _labelAsset.text.Split('"').Where((item, index) => index % 2 != 0);
-			//get every other item
+			// Get every other item
 			_labels = stringArray.Where((x, i) => i % 2 != 0).ToArray();
 		}
 
 		void Update()
 		{
-
 			WebCamTexture webCamTexture = _cameraView.GetCamImage();
 
 			if (webCamTexture.didUpdateThisFrame && webCamTexture.width > 100)
@@ -64,23 +63,32 @@ namespace ImageClassification.Core
 
 		IEnumerator RunModelRoutine(byte[] pixels)
 		{
-
 			Tensor tensor = TransformInput(pixels);
 
-			var inputs = new Dictionary<string, Tensor> {
-			{ INPUT_NAME, tensor }
-		};
+			var inputs = new Dictionary<string, Tensor> 
+			{
+				{ INPUT_NAME, tensor }
+			};
 
 			_worker.Execute(inputs);
 			Tensor outputTensor = _worker.PeekOutput(OUTPUT_NAME);
 
-			//get largest output
+			// Get largest output
 			List<float> temp = outputTensor.ToReadOnlyArray().ToList();
 			float max = temp.Max();
 			int index = temp.IndexOf(max);
 
-			//set UI text
+			// Set UI text
 			_outputText.text = _labels[index];
+
+			// Use translation if needed
+			if (_useTranslation)
+			{
+				Translator.Instance.TranslateCachedText(_labels[index], (success, translatedText) =>
+				{
+					_outputText.text = translatedText;
+				});
+			}
 
 			//dispose tensors
 			tensor.Dispose();
@@ -88,7 +96,7 @@ namespace ImageClassification.Core
 			yield return null;
 		}
 
-		//transform from 0-255 to -1 to 1
+		// Transform from 0-255 to -1 to 1
 		Tensor TransformInput(byte[] pixels)
 		{
 			float[] transformedPixels = new float[pixels.Length];
